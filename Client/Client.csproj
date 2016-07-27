@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D8AE98B5-2FFB-4F91-AE76-4A338AD12032}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Generoft.AM.Public.Map.Client</RootNamespace>
+    <AssemblyName>Generoft.AM.Public.Map.Client</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath />
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\build\client\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevExpress.Data.v10.2">
+      <HintPath>..\..\bin\DevExpress.Data.v10.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Design.v10.2">
+      <HintPath>..\..\bin\DevExpress.Design.v10.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v10.2">
+      <HintPath>..\..\bin\DevExpress.Utils.v10.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraBars.v10.2">
+      <HintPath>..\..\bin\DevExpress.XtraBars.v10.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraBars.v10.2.Design">
+      <HintPath>..\..\bin\DevExpress.XtraBars.v10.2.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v10.2">
+      <HintPath>..\..\bin\DevExpress.XtraEditors.v10.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v10.2.Design">
+      <HintPath>..\..\bin\DevExpress.XtraEditors.v10.2.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.AM.Pub.BillSPI">
+      <HintPath>..\..\bin\Genersoft.AM.Pub.BillSPI.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.Platform.AppFramework.ClientService">
+      <HintPath>..\..\bin\Genersoft.Platform.AppFramework.ClientService.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.Platform.AppFramework.GuiCore, Version=3.0.10916.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\Genersoft.Platform.AppFramework.GuiCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.Platform.AppFramework.SPI">
+      <HintPath>..\..\bin\Genersoft.Platform.AppFramework.SPI.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.Platform.Core.Common">
+      <HintPath>..\..\bin\Genersoft.Platform.Core.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.Platform.Core.Error">
+      <HintPath>..\..\bin\Genersoft.Platform.Core.Error.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.Platform.Core.Event">
+      <HintPath>..\..\bin\Genersoft.Platform.Core.Event.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.Platform.Core.Session">
+      <HintPath>..\..\bin\Genersoft.Platform.Core.Session.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json4.5">
+      <HintPath>D:\Program Files\Genersoft\bscw_local\bin\Newtonsoft.Json4.5.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommonFuncForWeb.cs" />
+    <Compile Include="DataChangedEventArgs.cs" />
+    <Compile Include="FrmMapQuery.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmMapQuery.Designer.cs">
+      <DependentUpon>FrmMapQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmShowMapInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmShowMapInfo.Designer.cs">
+      <DependentUpon>FrmShowMapInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FrmSelectPosition.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmSelectPosition.Designer.cs">
+      <DependentUpon>FrmSelectPosition.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FrmMapQuery.resx">
+      <DependentUpon>FrmMapQuery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmSelectPosition.resx">
+      <DependentUpon>FrmSelectPosition.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmShowMapInfo.resx">
+      <DependentUpon>FrmShowMapInfo.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SmartPart\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SPI\SPI.csproj">
+      <Project>{8E514E28-13E0-41A0-B042-CFA8C7114928}</Project>
+      <Name>SPI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
