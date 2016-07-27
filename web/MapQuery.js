@@ -10,6 +10,7 @@ var myCurMapPath = getQueryString("areapath");
 var myValueCol = getQueryString("valuecol");
 var option;
 var stddata;
+var stddatadimension;
 
 initMap();
 barchart();
@@ -17,7 +18,9 @@ myChart.on('dblclick', function (params) {
     loadData(params.name);
     
 });
+//价值分析时通过选择地图进行柱状图对比
 myChart.on('mapselectchanged', function (params) {
+    if (myMapCode != 'AMZCMapAllCost') return;
     var selected = params.selected;
     var names = [];
     var ss = JSON.parse(myMapSet.SeriesSet);
@@ -39,6 +42,33 @@ myChart.on('mapselectchanged', function (params) {
     myChartBar.setOption(optiontemp);
     //if(params.name == )
 });
+//其余通过选择图例
+myChart.on('legendselectchanged', function (params) {
+    if (myMapCode == 'AMZCMapAllCost') return;
+    if (stddatadimension == null || stddatadimension == 'undefined') return;
+    var selected = params.selected;
+    var ss = JSON.parse(myMapSet.SeriesSet);
+    var data = summarizedatabydimension(stddatadimension, ss);
+    var names = [];
+    var legendnames = [];
+    var seriesdata = [];
+    for (var o in data) {
+        if (selected[o]) {
+            names.push(o);
+        }
+    }
+    var optiontemp = {
+        legend: {
+            data: ['资产数量', '资产原值', '资产净值']
+        },
+        yAxis: {
+            data: names
+        },
+        series: getbardataseries(names,data)
+    }
+    myChartBar.setOption(optiontemp);
+    
+})
 //初始化地图数据
 function initMap()
 {
@@ -103,6 +133,7 @@ function loadAreaData(area)
     if (area["Data"] == null) {
         area["Data"] = JSON.parse(window.external.GetAreaDataJson(myMapCode, area.Path, area.Grade, myCond, myExtInfo));
     }
+    stddatadimension = area["Data"];
     if (area.IsDetail == "1")
     {
         //if (area.data == "undefined" || area.data == null) return;
@@ -162,6 +193,9 @@ function getSeries(area) {
     var ss = JSON.parse(myMapSet.SeriesSet);
     var series = [];
     var valueCol = myValueCol == null ? ss.ValueCols[0].Col : myValueCol;
+    var selectmode;
+    if (myMapCode == 'AMZCMapAllCost') selectmode = 'multiple';
+    else selectmode = false;
     if (ss.SeriesCol == "undefined" || ss.SeriesCol == null)
     {
         var count = ss.ValueCols.length;
@@ -170,7 +204,7 @@ function getSeries(area) {
                 name: ss.ValueCols[i].Name,
                 type: 'map',
                 mapType: area.Name,
-                selectedMode: 'multiple',
+                selectedMode: selectmode,
                 scaleLimit: { min: 0.5, max: 2.0 },
                 label: {
                     normal: {
@@ -207,7 +241,7 @@ function getSeries(area) {
                         name: t,
                         type: 'map',
                         mapType: area.Name,
-                        selectedMode: 'multiple',
+                        selectedMode: selectmode,
                         scaleLimit: { min: 0.5, max: 2.0 },
                         label: {
                             normal: {
@@ -230,26 +264,46 @@ function getSeries(area) {
 }
 //加载区域数据
 function showAreaData(area) {
+    var selectmode;
+    var legendnames = getSerieNames(area);
+    var selected = {};
+    if (myMapCode == 'AMZCMapAllCost') {
+        selectmode = 'single';
+    }
+    else {
+        selectmode = 'multiple';
+        for (var i = 0; i < legendnames.length; i++) {
+            if (i == 0) selected[legendnames[i]] = true;
+            else selected[legendnames[i]] = false;
+        }
+    }
     option = {
         backgroundColor: '#404a59',
         title: {
             text: myMapSet.MapName,
             subtext: area.Name,
-            left: 'center'
+            left: 'center',
+            textStyle: {
+                color: '#ccc'
+            }
         },
         tooltip: {
             trigger: 'item'
         },
         legend: {
             orient: 'vertical',
-            left: 'right',
-            selectedMode: 'single',
-            data: getSerieNames(area)
+            left: 'left',
+            selectedMode: selectmode,
+            selected: selected,
+            data: legendnames,
+            textStyle: {
+                color: '#de771f'
+            }
         },
         visualMap: {
             min: 0,
             max: 2500,
-            left: 'left',
+            left: 'right',
             top: 'bottom',
             text: ['高', '低'],           // 文本，默认为数值文本
             calculable: true,
@@ -271,7 +325,8 @@ function showAreaData(area) {
     };
     myChart.setOption(option, true);
     settabledatas(area);
-    piechart(area, myMapCode, myMapSet,myChartPie);
+    piechart(area, myMapCode, myMapSet, myChartPie);
+    //summarizedatabydimension(area.Data, JSON.parse(myMapSet.SeriesSet));
 }
 //根据名称获取区域
 function getMapArea(name) {
@@ -320,27 +375,12 @@ function settabledatas(area) {
             "scrollY": 100,
             "scrollCollapse": true,
             "data": datas,
-            "columns": names
+            "columns": names,
+            "jQueryUI":true
         });
     });
 }
-function getdimensionnamebycode(strcode)
-{
-    var codename;
-    if (strcode == 'AMZCMapAllCost') {
-        codename = "资产类别";
-    }
-    else if (strcode == 'AMZCMapTypeCost') {
-        codename = "资产类别";
-    }
-    else if (strcode == 'AMZCMapOwnerCost') {
-        codename = "所属单位";
-    }
-    else if (strcode == 'AMZCMapLandCost') {
-        codename = "资产类别";
-    }
-    return codename;
-}
+
 
 function piechart(area, strcode, mapset,chart) {
     
@@ -435,10 +475,14 @@ function barchart(t) {
     //}
     //title = title + '地区对比';
     var optiontemp = option;
+    var title = '(按地区)';
+    if (myMapCode == 'AMZCMapTypeCost' || myMapCode == 'AMZCMapLandCost') title = '(按类别)';
+    else if (myMapCode == 'AMZCMapOwnerCost') title = '(按权属)';
+    else if (myMapCode == 'AMZCMapAllCost') title = '(按地区)';
     var optionbar = {
         backgroundColor: '#2c343c',
         title: {
-            text: '资产价值地区对比',
+            text: '资产价值对比'+title,
             left: 'left',
             top:20,
             textStyle: {
@@ -457,6 +501,7 @@ function barchart(t) {
             textStyle:{
                 color: '#ff006e'
             },
+            selectedMode:'single',
             data: []
         },
         grid: {
@@ -484,7 +529,11 @@ function barchart(t) {
                 lineStyle: {
                     color: '#ccc'
                 }
+            },
+            axisLabel: {
+                show: false
             }
+
         },
         series: [
             //{
@@ -502,23 +551,47 @@ function barchart(t) {
 
     myChartBar.setOption(optionbar);
 }
-//参数为选中的地区序列
-function getbardataseries(names)
+//参数为选中的地区序列 最多两参数
+function getbardataseries()
 {
+    var len = arguments.length;
+    if (len < 1) return;
     var series = [];
     var ss = JSON.parse(myMapSet.SeriesSet);
+    var names = arguments[0];
     for (var i = 0; i < ss.ValueCols.length; i++) {
         var data = [];
         for (var j = 0; j < names.length; j++) {
-            for (var k = 0; k < stddata.length;k++)
-            {
-                if (stddata[k].AreaName == names[j]) {
-                    data.push(stddata[k][ss.ValueCols[i].Col]);
+            if (len == 1) {//地区对比
+                for (var k = 0; k < stddata.length; k++) {
+                    if (stddata[k].AreaName == names[j]) {
+                        data.push(stddata[k][ss.ValueCols[i].Col]);
+                    }
                 }
             }
+            else if (len == 2) {//根据维度对比需要第二个参数 分组合计后的数据
+                var bardata = arguments[1];
+                for (var j = 0; j < names.length; j++) {
+                    data.push(bardata[names[j]][ss.ValueCols[i].Name]);
+                }
+            }
+            
         }
-        series.push({ name: ss.ValueCols[i].Name, type: 'bar', data: data });
+        series.push({ name: ss.ValueCols[i].Name, type: 'bar', label: { normal: { show: true, formatter:'{b}' } }, data: data });
     }
     return series;
 
 }
+//function getbardataseries(names,bardata) {
+//    var series = [];
+//    var ss = JSON.parse(myMapSet.SeriesSet);
+//    for (var i = 0; i < ss.ValueCols.length; i++) {
+//        var data = [];
+//        for (var j = 0; j < names.length; j++) {
+//            data.push(bardata[names[j]][ss.ValueCols[i].Name]);
+//        }
+//        series.push({ name: ss.ValueCols[i].Name, type: 'bar', data: data });
+//    }
+//    return series;
+
+//}

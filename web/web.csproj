@@ -78,7 +78,6 @@
     <Content Include="jquery.dataTables.min.js" />
     <Content Include="jQueryUI.css" />
     <Content Include="lib\json2.js" />
-    <Content Include="MapPie.js" />
     <Content Include="MapQueryBaidu.html" />
     <Content Include="BaiduMap.js" />
     <Content Include="echarts\echarts.min.js" />

@@ -333,6 +333,7 @@ table.dataTable {
                 background: -ms-linear-gradient(top, #fff 0%, #dcdcdc 100%);
                 background: -o-linear-gradient(top, #fff 0%, #dcdcdc 100%);
                 background: linear-gradient(to bottom, #fff 0%, #dcdcdc 100%);
+                
             }
 
             .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
