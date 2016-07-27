@@ -242,7 +242,7 @@ function showAreaData(area) {
         },
         legend: {
             orient: 'vertical',
-            left: 'left',
+            left: 'right',
             selectedMode: 'single',
             data: getSerieNames(area)
         },
