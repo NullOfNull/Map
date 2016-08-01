@@ -8,11 +8,13 @@ table.dataTable {
 
     table.dataTable thead th, table.dataTable tfoot th {
         font-weight: bold;
+        border-top: 1px solid #ccc;
+        color:white;
     }
 
     table.dataTable thead th, table.dataTable thead td {
         padding: 10px 18px;
-        border-bottom: 1px solid #111;
+        border-bottom: 1px solid #ccc;
     }
 
         table.dataTable thead th:active, table.dataTable thead td:active {
@@ -21,7 +23,7 @@ table.dataTable {
 
     table.dataTable tfoot th, table.dataTable tfoot td {
         padding: 10px 18px 6px 18px;
-        border-top: 1px solid #111;
+        border-top: 1px solid #ccc;
     }
 
     table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
@@ -64,6 +66,8 @@ table.dataTable {
 
     table.dataTable tbody th, table.dataTable tbody td {
         padding: 8px 10px;
+        outline-color: black;
+        color:black;
     }
 
     table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.dataTable.display tbody th, table.dataTable.display tbody td {
@@ -282,14 +286,17 @@ table.dataTable {
     .dataTables_wrapper .dataTables_length {
         float: left;
         padding-left:10px;
-        
+        padding-top: 20px;
+        padding-bottom: 10px;
     }
 
     .dataTables_wrapper .dataTables_filter {
         float: right;
         padding-right:20px;
+        padding-top:20px;
+        padding-bottom: 10px;
         text-align: right;
-        
+                
     }
 
         .dataTables_wrapper .dataTables_filter input {
@@ -303,6 +310,7 @@ table.dataTable {
     }
 
     .dataTables_wrapper .dataTables_paginate {
+        color:#ccc;
         float: right;
         text-align: right;
         padding-top: 0.25em;
@@ -318,7 +326,7 @@ table.dataTable {
             text-decoration: none !important;
             cursor: pointer;
             *cursor: hand;
-            color: #333 !important;
+            color: #ccc !important;
             border: 1px solid transparent;
             border-radius: 2px;
         }
@@ -393,7 +401,7 @@ table.dataTable {
     }
 
     .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
-        color: #333;
+        color: #ccc;
     }
 
     .dataTables_wrapper .dataTables_scroll {

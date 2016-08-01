@@ -1,4 +1,4 @@
-﻿var myChart = echarts.init(document.getElementById('mainMap'));
+var myChart = echarts.init(document.getElementById('mainMap'));
 var myChartPie = echarts.init(document.getElementById('piedemo'));
 var myChartBar = echarts.init(document.getElementById('bardemo'));
 var myMapCode = getQueryString("map");
@@ -13,18 +13,19 @@ var stddata;
 var stddatadimension;
 
 initMap();
+document.getElementById("float").style.visibility ='hidden';
 barchart();
-myChart.on('dblclick', function (params) {
+myChart.on('dblclick', function(params) {
     loadData(params.name);
-    
+
 });
 //价值分析时通过选择地图进行柱状图对比
-myChart.on('mapselectchanged', function (params) {
+myChart.on('mapselectchanged', function(params) {
     if (myMapCode != 'AMZCMapAllCost') return;
     var selected = params.selected;
     var names = [];
     var ss = JSON.parse(myMapSet.SeriesSet);
-    
+
     for (var i = 0; i < stddata.length; i++) {
         if (selected[stddata[i].AreaName]) {
             names.push(stddata[i].AreaName);
@@ -32,7 +33,7 @@ myChart.on('mapselectchanged', function (params) {
     }
     var optiontemp = {
         legend: {
-            data:['资产数量','资产原值','资产净值']
+            data: ['资产数量', '资产原值', '资产净值']
         },
         yAxis: {
             data: names
@@ -43,35 +44,34 @@ myChart.on('mapselectchanged', function (params) {
     //if(params.name == )
 });
 //其余通过选择图例
-myChart.on('legendselectchanged', function (params) {
-    if (myMapCode == 'AMZCMapAllCost') return;
-    if (stddatadimension == null || stddatadimension == 'undefined') return;
-    var selected = params.selected;
-    var ss = JSON.parse(myMapSet.SeriesSet);
-    var data = summarizedatabydimension(stddatadimension, ss);
-    var names = [];
-    var legendnames = [];
-    var seriesdata = [];
-    for (var o in data) {
-        if (selected[o]) {
-            names.push(o);
+myChart.on('legendselectchanged', function(params) {
+        if (myMapCode == 'AMZCMapAllCost') return;
+        if (stddatadimension == null || stddatadimension == 'undefined') return;
+        var selected = params.selected;
+        var ss = JSON.parse(myMapSet.SeriesSet);
+        var data = summarizedatabydimension(stddatadimension, ss);
+        var names = [];
+        var legendnames = [];
+        var seriesdata = [];
+        for (var o in data) {
+            if (selected[o]) {
+                names.push(o);
+            }
         }
-    }
-    var optiontemp = {
-        legend: {
-            data: ['资产数量', '资产原值', '资产净值']
-        },
-        yAxis: {
-            data: names
-        },
-        series: getbardataseries(names,data)
-    }
-    myChartBar.setOption(optiontemp);
-    
-})
-//初始化地图数据
-function initMap()
-{
+        var optiontemp = {
+            legend: {
+                data: ['资产数量', '资产原值', '资产净值']
+            },
+            yAxis: {
+                data: names
+            },
+            series: getbardataseries(names, data)
+        }
+        myChartBar.setOption(optiontemp);
+
+    })
+    //初始化地图数据
+function initMap() {
     if (myMapAreas != null && myMapAreas.length > 0) {
         if (myCurMapPath == null)
             loadAreaData(myMapAreas[1]);
@@ -80,8 +80,7 @@ function initMap()
     }
 }
 //返回上级
-function returnParent()
-{
+function returnParent() {
     if (myMapAreas != null && myMapAreas.length > 0) {
         if (myCurMapPath == null || myCurMapPath.length == 4)
             loadAreaData(myMapAreas[0]);
@@ -90,14 +89,12 @@ function returnParent()
     }
 }
 //设置取值列
-function setValueCol(colname)
-{
+function setValueCol(colname) {
     myValueCol = colname;
     refreshMap();
 }
 //刷新数据-当前级
-function refreshMap()
-{
+function refreshMap() {
     if (myMapAreas != null && myMapAreas.length > 0) {
         if (myCurMapPath == null || myCurMapPath.length == 4)
             loadAreaData(myMapAreas[0]);
@@ -106,8 +103,7 @@ function refreshMap()
     }
 }
 //根据分级码加载数据
-function loadDataByPath(path)
-{
+function loadDataByPath(path) {
     if (myMapAreas != null && myMapAreas.length > 0) {
 
         var count = myMapAreas.length;
@@ -120,38 +116,33 @@ function loadDataByPath(path)
     }
 }
 //加载数据
-function loadData(name)
-{
-    var area = getMapArea(name); 
-    loadAreaData(area);    
+function loadData(name) {
+    var area = getMapArea(name);
+    loadAreaData(area);
 }
 //加载区域数据
-function loadAreaData(area)
-{
+function loadAreaData(area) {
     if (area == null || area == "undefined")
         return;
     if (area["Data"] == null) {
         area["Data"] = JSON.parse(window.external.GetAreaDataJson(myMapCode, area.Path, area.Grade, myCond, myExtInfo));
     }
     stddatadimension = area["Data"];
-    if (area.IsDetail == "1")
-    {
+    if (area.IsDetail == "1") {
         //if (area.data == "undefined" || area.data == null) return;
-        var h = "MapQueryBaidu.html?map=" + myMapCode + "&areapath=" + area.Path
-            + "&areaname=" + area.Name;
+        var h = "MapQueryBaidu.html?map=" + myMapCode + "&areapath=" + area.Path + "&areaname=" + area.Name;
         if (myValueCol != null)
             h += "&valuecol=" + myValueCol;
-        window.location.href =  h;
+        window.location.href = h;
         return;
     }
-   
+
     myCurMapPath = area.Path;
-    if(echarts.getMap(area.Name)==null)
-    {
+    if (echarts.getMap(area.Name) == null) {
         if (area.MapFile == null || area.MapFile == "")
             return;
-        $.get("echarts/data/" + encodeURI(area.MapFile) + ".json", {}, function (mapJson) {
-            echarts.registerMap(area.Name, mapJson); 
+        $.get("echarts/data/" + encodeURI(area.MapFile) + ".json", {}, function(mapJson) {
+            echarts.registerMap(area.Name, mapJson);
             showAreaData(area);
         });
         return;
@@ -164,21 +155,16 @@ function getSerieNames(area) {
     if (ss == null)
         return null;
     var snames = [];
-    if (ss.SeriesCol == "undefined" || ss.SeriesCol == null)
-    {
+    if (ss.SeriesCol == "undefined" || ss.SeriesCol == null) {
         var count = ss.ValueCols.length;
         for (var i = 0; i < count; i++)
             snames.push(ss.ValueCols[i].Name);
-    }
-    else
-    {
+    } else {
         var d = area.Data;
-        if (d != "undefined" && d != null)
-        {
+        if (d != "undefined" && d != null) {
             var c = d.length;
             var s = ",";
-            for (var j = 0; j < c; j++)
-            {
+            for (var j = 0; j < c; j++) {
                 var t = d[j][ss.SeriesCol.NameCol];
                 if (t == "undefined" || t == null || t == "" || s.indexOf("," + t + ",") >= 0)
                     continue;
@@ -189,6 +175,7 @@ function getSerieNames(area) {
     }
     return snames;
 }
+
 function getSeries(area) {
     var ss = JSON.parse(myMapSet.SeriesSet);
     var series = [];
@@ -196,8 +183,7 @@ function getSeries(area) {
     var selectmode;
     if (myMapCode == 'AMZCMapAllCost') selectmode = 'multiple';
     else selectmode = false;
-    if (ss.SeriesCol == "undefined" || ss.SeriesCol == null)
-    {
+    if (ss.SeriesCol == "undefined" || ss.SeriesCol == null) {
         var count = ss.ValueCols.length;
         for (var i = 0; i < count; i++) {
             var s = {
@@ -205,7 +191,10 @@ function getSeries(area) {
                 type: 'map',
                 mapType: area.Name,
                 selectedMode: selectmode,
-                scaleLimit: { min: 0.5, max: 2.0 },
+                scaleLimit: {
+                    min: 0.5,
+                    max: 2.0
+                },
                 label: {
                     normal: {
                         show: false
@@ -214,19 +203,20 @@ function getSeries(area) {
                         show: true
                     }
                 },
-                data: (function () {
+                data: (function() {
                     var count1 = area.Data.length;
                     var da = [];
                     for (var j = 0; j < count1; j++)
-                        da.push({ name: area.Data[j].AreaName, value: area.Data[j][ss.ValueCols[i].Col] });
+                        da.push({
+                            name: area.Data[j].AreaName,
+                            value: area.Data[j][ss.ValueCols[i].Col]
+                        });
                     return da;
                 })()
             };
             series.push(s);
         }
-    }
-    else
-    {
+    } else {
         var d = area.Data;
         if (d != "undefined" && d != null) {
             var c = d.length;
@@ -235,14 +225,16 @@ function getSeries(area) {
                 var t = d[j][ss.SeriesCol.NameCol];
                 if (t == "undefined" || t == null || t == "")
                     continue;
-                if (s[t] == "undefined" || s[t] == null)
-                {
+                if (s[t] == "undefined" || s[t] == null) {
                     s[t] = {
                         name: t,
                         type: 'map',
                         mapType: area.Name,
                         selectedMode: selectmode,
-                        scaleLimit: { min: 0.5, max: 2.0 },
+                        scaleLimit: {
+                            min: 0.5,
+                            max: 2.0
+                        },
                         label: {
                             normal: {
                                 show: false
@@ -251,12 +243,17 @@ function getSeries(area) {
                                 show: true
                             }
                         },
-                        data: [{ name: d[j].AreaName, value: d[j][valueCol] }]
+                        data: [{
+                            name: d[j].AreaName,
+                            value: d[j][valueCol]
+                        }]
                     };
                     series.push(s[t]);
-                }
-                else
-                    s[t].data.push({ name: d[j].AreaName, value: d[j][valueCol] });
+                } else
+                    s[t].data.push({
+                        name: d[j].AreaName,
+                        value: d[j][valueCol]
+                    });
             }
         }
     }
@@ -269,8 +266,7 @@ function showAreaData(area) {
     var selected = {};
     if (myMapCode == 'AMZCMapAllCost') {
         selectmode = 'single';
-    }
-    else {
+    } else {
         selectmode = 'multiple';
         for (var i = 0; i < legendnames.length; i++) {
             if (i == 0) selected[legendnames[i]] = true;
@@ -305,9 +301,9 @@ function showAreaData(area) {
             max: 2500,
             left: 'right',
             top: 'bottom',
-            text: ['高', '低'],           // 文本，默认为数值文本
+            text: ['高', '低'], // 文本，默认为数值文本
             calculable: true,
-            realtime:false
+            realtime: false
         },
         toolbox: {
             show: true,
@@ -315,12 +311,21 @@ function showAreaData(area) {
             left: 'right',
             top: 'center',
             feature: {
-                dataView: { readOnly: false },
+                myDataView:{
+                    show:true,
+                    title:'数据列表',
+                    icon:'path://M432.45,595.444c0,2.177-4.661,6.82-11.305,6.82c-6.475,0-11.306-4.567-11.306-6.82s4.852-6.812,11.306-6.812C427.841,588.632,432.452,593.191,432.45,595.444L432.45,595.444z M421.155,589.876c-3.009,0-5.448,2.495-5.448,5.572s2.439,5.572,5.448,5.572c3.01,0,5.449-2.495,5.449-5.572C426.604,592.371,424.165,589.876,421.155,589.876L421.155,589.876z M421.146,591.891c-1.916,0-3.47,1.589-3.47,3.549c0,1.959,1.554,3.548,3.47,3.548s3.469-1.589,3.469-3.548C424.614,593.479,423.062,591.891,421.146,591.891L421.146,591.891zM421.146,591.891',
+                    onclick:function(){
+                        document.getElementById('float').style.visibility = 'visible';
+                        //document.getElementById('mainMap').style.display='none';
+                    }
+                },
+                
                 restore: {},
                 saveAsImage: {}
             }
         },
-        animation:false,
+        animation: false,
         series: getSeries(area)
     };
     myChart.setOption(option, true);
@@ -331,35 +336,38 @@ function showAreaData(area) {
 //根据名称获取区域
 function getMapArea(name) {
     var count = myMapAreas.length;
-    for (var i = 0; i < count; i++)
-    {
+    for (var i = 0; i < count; i++) {
         if (myMapAreas[i].Name == name)
             return myMapAreas[i];
     }
 }
 
 function settabledatas(area) {
-    var names = [];//columnsname
-    var datas = [];//data
+    var names = []; //columnsname
+    var datas = []; //data
     var series = true;
     //columnsname
-    names.push({ "title": "地区" });
+    names.push({
+        "title": "地区"
+    });
     var ss = JSON.parse(myMapSet.SeriesSet);
     if (ss == null)
         return null;
     if (ss.SeriesCol == "undefined" || ss.SeriesCol == null) {
         series = false;
-    }
-    else {
-        names.push({ "title": getdimensionnamebycode(myMapCode) });
+    } else {
+        names.push({
+            "title": getdimensionnamebycode(myMapCode)
+        });
     }
     var count = ss.ValueCols.length;
     for (var i = 0; i < count; i++)
-        names.push({ "title": ss.ValueCols[i].Name });
+        names.push({
+            "title": ss.ValueCols[i].Name
+        });
     //data
     var d = area.Data;
-    for (var i = 0; i < d.length; i++)
-    {
+    for (var i = 0; i < d.length; i++) {
         var temp = [];
         temp.push(d[i].AreaName);
         if (series) temp.push(d[i][ss.SeriesCol.NameCol]);
@@ -367,23 +375,22 @@ function settabledatas(area) {
             temp.push(d[i][ss.ValueCols[j].Col]);
         }
         datas.push(temp);
-        
+
     }
-    $(document).ready(function () {
-        $("#example").dataTable({
-            "bDestroy":true,
-            "scrollY": 100,
+    $(document).ready(function() {
+        var result = $("#example").dataTable({
+            "bDestroy": true,
+            "scrollY": 400,
             "scrollCollapse": true,
             "data": datas,
-            "columns": names,
-            "jQueryUI":true
+            "columns": names
         });
     });
 }
 
 
-function piechart(area, strcode, mapset,chart) {
-    
+function piechart(area, strcode, mapset, chart) {
+
     var mapcode = strcode;
     var ss = JSON.parse(mapset.SeriesSet);
     var valuecol = myValueCol == null ? ss.ValueCols[0].Col : myValueCol;
@@ -420,39 +427,40 @@ function piechart(area, strcode, mapset,chart) {
         //        colorLightness: [0, 1]
         //    }
         //},不需要
-        series: [
-            {
-                name: '地区',
-                type: 'pie',
-                radius: '50%',
-                center: ['50%', '60%'],
-                data: getdatasofpie(area, ss.ValueCols[0].Col).sort(function (a, b) { return a.value - b.value }),
-                roseType: 'angle',
-                label: {
-                    normal: {
-                        textStyle: {
-                            color: 'rgba(255, 255, 255, 0.3)'
-                        }
-                    }
-                },
-                labelLine: {
-                    normal: {
-                        lineStyle: {
-                            color: 'rgba(255, 255, 255, 0.3)'
-                        },
-                        smooth: 0.2,
-                        length: 10,
-                        length2: 20
+        series: [{
+            name: '地区',
+            type: 'pie',
+            radius: '50%',
+            center: ['50%', '60%'],
+            data: getdatasofpie(area, ss.ValueCols[0].Col).sort(function(a, b) {
+                return a.value - b.value
+            }),
+            roseType: 'angle',
+            label: {
+                normal: {
+                    textStyle: {
+                        color: 'rgba(255, 255, 255, 0.3)'
                     }
                 }
-                
+            },
+            labelLine: {
+                normal: {
+                    lineStyle: {
+                        color: 'rgba(255, 255, 255, 0.3)'
+                    },
+                    smooth: 0.2,
+                    length: 10,
+                    length2: 20
+                }
             }
-        ]
+
+        }]
 
     };
     chart.setOption(optionPie);
 
 }
+
 function getdatasofpie(area, columnname) {
     var datas = [];
     var d = JSON.parse(window.external.GetAreaDataJson("AMZCMapAllCost", area.Path, area.Grade, myCond, myExtInfo));
@@ -460,7 +468,10 @@ function getdatasofpie(area, columnname) {
     var valuecol = myValueCol == null ? columnname : myValueCol;
     //default var colors = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'];
     for (var i = 0; i < d.length; i++) {
-        datas.push({ value: d[i][valuecol], name: d[i].AreaName});
+        datas.push({
+            value: d[i][valuecol],
+            name: d[i].AreaName
+        });
     }
     return datas;
 }
@@ -471,7 +482,7 @@ function barchart(t) {
     //var valuecol = myValueCol == null ? ss.ValueCols[0].Col : myValueCol;area, strcode, mapse
     //var valuecolname = [];
     //for (var i = 0; i < ss.ValueCols.length; i++) {
-     //   valuecolname.push(ss.ValueCols[i].Name);
+    //   valuecolname.push(ss.ValueCols[i].Name);
     //}
     //title = title + '地区对比';
     var optiontemp = option;
@@ -482,11 +493,12 @@ function barchart(t) {
     var optionbar = {
         backgroundColor: '#2c343c',
         title: {
-            text: '资产价值对比'+title,
+            text: '资产价值对比' + title,
             left: 'left',
-            top:20,
+            top: 20,
             textStyle: {
-                color: '#ccc'
+                color: '#ccc',
+                fontSize:15
             }
             //subtext: '数据来自网络'
         },
@@ -497,18 +509,18 @@ function barchart(t) {
             }
         },
         legend: {
-            top:'2px',
-            textStyle:{
+            top: '2px',
+            textStyle: {
                 color: '#ff006e'
             },
-            selectedMode:'single',
+            selectedMode: 'single',
             data: []
         },
         grid: {
             left: '10%'
-            //right: '4%',
-            //bottom: '3%',
-            //containLabel: true
+                //right: '4%',
+                //bottom: '3%',
+                //containLabel: true
         },
         xAxis: {
             type: 'value',
@@ -519,7 +531,7 @@ function barchart(t) {
                 }
             },
             axisLabel: {
-                rotate:45
+                rotate: 45
             }
         },
         yAxis: {
@@ -552,8 +564,7 @@ function barchart(t) {
     myChartBar.setOption(optionbar);
 }
 //参数为选中的地区序列 最多两参数
-function getbardataseries()
-{
+function getbardataseries() {
     var len = arguments.length;
     if (len < 1) return;
     var series = [];
@@ -562,22 +573,31 @@ function getbardataseries()
     for (var i = 0; i < ss.ValueCols.length; i++) {
         var data = [];
         for (var j = 0; j < names.length; j++) {
-            if (len == 1) {//地区对比
+            if (len == 1) { //地区对比
                 for (var k = 0; k < stddata.length; k++) {
                     if (stddata[k].AreaName == names[j]) {
                         data.push(stddata[k][ss.ValueCols[i].Col]);
                     }
                 }
-            }
-            else if (len == 2) {//根据维度对比需要第二个参数 分组合计后的数据
+            } else if (len == 2) { //根据维度对比需要第二个参数 分组合计后的数据
                 var bardata = arguments[1];
                 for (var j = 0; j < names.length; j++) {
                     data.push(bardata[names[j]][ss.ValueCols[i].Name]);
                 }
             }
-            
+
         }
-        series.push({ name: ss.ValueCols[i].Name, type: 'bar', label: { normal: { show: true, formatter:'{b}' } }, data: data });
+        series.push({
+            name: ss.ValueCols[i].Name,
+            type: 'bar',
+            label: {
+                normal: {
+                    show: true,
+                    formatter: '{b}'
+                }
+            },
+            data: data
+        });
     }
     return series;
 
