@@ -64,8 +64,11 @@
     <Reference Include="DevExpress.XtraEditors.v10.2.Design">
       <HintPath>..\..\bin\DevExpress.XtraEditors.v10.2.Design.dll</HintPath>
     </Reference>
-    <Reference Include="Genersoft.AM.Pub.BillSPI">
-      <HintPath>..\..\bin\Genersoft.AM.Pub.BillSPI.dll</HintPath>
+    <Reference Include="Genersoft.AM.Public.Pub.Client">
+      <HintPath>D:\workplace\DPPUB\DPPub\build\client\Genersoft.AM.Public.Pub.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Genersoft.AM.Public.Pub.SPI">
+      <HintPath>D:\workplace\DPPUB\DPPub\SPI\obj\Debug\Genersoft.AM.Public.Pub.SPI.dll</HintPath>
     </Reference>
     <Reference Include="Genersoft.Platform.AppFramework.ClientService">
       <HintPath>..\..\bin\Genersoft.Platform.AppFramework.ClientService.dll</HintPath>

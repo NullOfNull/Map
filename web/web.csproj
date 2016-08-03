@@ -72,11 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="BaiduMap.aspx" />
-    <Content Include="dataTables.foundation.min.css" />
-    <Content Include="dataTables.foundation.min.js" />
     <Content Include="jquery.dataTables.min.css" />
     <Content Include="jquery.dataTables.min.js" />
-    <Content Include="jQueryUI.css" />
     <Content Include="lib\json2.js" />
     <Content Include="MapQueryBaidu.html" />
     <Content Include="BaiduMap.js" />
@@ -108,12 +105,6 @@
       <DependentUpon>BaiduMap.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="datatables.jqueryUI.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="foundation.min.css" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

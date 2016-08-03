@@ -7,32 +7,7 @@ function getQueryString(name) {
 }
 
 
-function getdimensionnamebycode(strcode) {
-    var codename;
-    if (strcode == 'AMZCMapAllCost') {
-        codename = "资产类别";
-    }
-    else if (strcode == 'AMZCMapTypeCost') {
-        codename = "资产类别";
-    }
-    else if (strcode == 'AMZCMapOwnerCost') {
-        codename = "所属单位";
-    }
-    else if (strcode == 'AMZCMapLandCost') {
-        codename = "资产类别";
-    }
-    return codename;
-}
-function getdimensioncodebyname(strname) {
-    var code;
-    switch (strname) {
-        case '资产价值': code = 'AMZCMapAllCost'; break;
-        case '资产类别': code = 'AMZCMapTypeCost'; break;
-        case '所属单位': code = 'AMZCMapOwnerCost'; break;
-        default: code = 'AMZCMapAllCost'; break;
-    }
-    return code;
-}
+
 //按价值列汇总数据
 function summarizedatabydimension(data,seriesset)
 {

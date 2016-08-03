@@ -8,9 +8,8 @@ using Genersoft.Platform.Core.Error;
 using System.Windows.Forms;
 using Generoft.AM.Public.Map.SPI.Entity;
 using System.Data;
-using Genersoft.AM.Pub.BillSPI;
-using Genersoft.AM.Pub.BillSPI.Manager;
-using Genersoft.AM.Pub.BillSPI.Entity;
+using Genersoft.AM.Public.Pub.Client;
+using Genersoft.AM.Public.Pub.SPI;
 using Newtonsoft.Json;
 
 namespace Generoft.AM.Public.Map.Client
@@ -26,11 +25,23 @@ namespace Generoft.AM.Public.Map.Client
         /// 服务端管理类
         /// </summary>
         public string MgrClassName { set; get; }
+        /// <summary>
+        /// mkid
+        /// </summary>
+        public string MKID { get; set; }
+        public MKMapList MKMapList
+        {
+            get;
+            set;
+        }
         public CommonFuncForWeb()
         {
             MgrAssembly = "Generoft.AM.Public.Map.Core.dll";
             MgrClassName = "Generoft.AM.Public.Map.Core.MapManager";
         }
+
+        private PubClient pubClient = new PubClient();
+
 
         WebBrowser _webBrowser;
         /// <summary>
@@ -233,8 +244,7 @@ namespace Generoft.AM.Public.Map.Client
         /// <param name="mapCode"></param>
         public void LoadData(string mapCode)
         {
-            IBillManager bm = BillManagerService.GetManager(string.Empty);
-            Markers markers = bm.CommonOperate(new BillOperParam(MgrAssembly, MgrClassName, "GetMarkerMap", "", mapCode)) as Markers;
+            Markers markers = pubClient.CommonOperate(new OperParam(MgrAssembly, MgrClassName, "GetMarkerMap", "", mapCode)) as Markers;
             AddMarkers(markers);
         }
         public void LoadMarkers(string mapCode, string areaPath, string cond, string extInfo)
@@ -252,7 +262,7 @@ namespace Generoft.AM.Public.Map.Client
         {
             if (_markerMap != null && _markerMap.MapCode == mapCode)
                 return _markerMap;
-            _markerMap = BillManagerService.GetManager(string.Empty).CommonOperate(new BillOperParam(MgrAssembly, MgrClassName, "GetMapSet", "", mapCode)) as MarkerMap;
+            _markerMap = pubClient.CommonOperate(new OperParam(MgrAssembly, MgrClassName, "GetMapSet", "", mapCode)) as MarkerMap;
             return _markerMap;
         }
         /// <summary>
@@ -265,6 +275,14 @@ namespace Generoft.AM.Public.Map.Client
             MarkerMap mm = GetMapSet(mapCode);
             return mm == null ? string.Empty : JsonConvert.SerializeObject(mm);
         }
+        /// <summary>
+        /// 获取模块地图列表的json对象
+        /// </summary>
+        /// <returns></returns>
+        public string GetMapSetByMK()
+        {
+            return MKMapList == null ? string.Empty : JsonConvert.SerializeObject(MKMapList);
+        }
         private static DataSet _mapAreas = null;
         /// <summary>
         /// 预制的地图区域
@@ -275,8 +293,7 @@ namespace Generoft.AM.Public.Map.Client
             {
                 if(_mapAreas==null)
                 {
-                    IBillManager bm = BillManagerService.GetManager(string.Empty);
-                    _mapAreas = bm.CommonOperate(new BillOperParam(MgrAssembly, MgrClassName, "GetMapArea", "")) as DataSet;
+                    _mapAreas = pubClient.CommonOperate(new OperParam(MgrAssembly, MgrClassName, "GetMapArea", "")) as DataSet;
                 }
                 return _mapAreas;
             }
@@ -314,8 +331,7 @@ namespace Generoft.AM.Public.Map.Client
         /// <returns></returns>
         public DataSet GetAreaData(string mapCode, string areaPath, string areaGrade, string cond, string extInfo)
         {
-            IBillManager bm = BillManagerService.GetManager(string.Empty);
-            return bm.CommonOperate(new BillOperParam(MgrAssembly, MgrClassName, "GetAreaData", "", mapCode, areaPath, areaGrade, cond, extInfo)) as DataSet;
+            return pubClient.CommonOperate(new OperParam(MgrAssembly, MgrClassName, "GetAreaData", "", mapCode, areaPath, areaGrade, cond, extInfo)) as DataSet;
         }
         /// <summary>
         /// 获取区域统计数据-json
@@ -338,7 +354,18 @@ namespace Generoft.AM.Public.Map.Client
         /// <returns></returns>
         public Markers GetMarkerMap(string mapCode, string areaPath, string cond, string extInfo)
         {
-            return BillManagerService.GetManager(string.Empty).CommonOperate(new BillOperParam(MgrAssembly, MgrClassName, "GetMarkerMap", "", mapCode, areaPath, cond, extInfo)) as Markers;
+            return pubClient.CommonOperate(new OperParam(MgrAssembly, MgrClassName, "GetMarkerMap", "", mapCode, areaPath, cond, extInfo)) as Markers;
+        }
+
+        public DataTable GetMKMap(string mkid)
+        {
+            DataTable dt = pubClient.CommonOperate(new OperParam(MgrAssembly, MgrClassName, "GetMKMap", "", mkid)) as DataTable;
+            if (dt.Rows == null || dt.Rows.Count < 1)
+            {
+                throw new GSPException("模块ID预制不正确", ErrorLevel.Warning);
+            }
+            
+            return dt;
         }
         /// <summary>
         /// 返回上级地图

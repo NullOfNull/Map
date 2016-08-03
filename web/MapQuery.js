@@ -8,9 +8,17 @@ var myMapSet = JSON.parse(window.external.GetMapSetJson(myMapCode));
 var myMapAreas = JSON.parse(window.external.MapAreasJson);
 var myCurMapPath = getQueryString("areapath");
 var myValueCol = getQueryString("valuecol");
+var maplistbymk = JSON.parse(window.external.GetMapSetByMK());
 var option;
 var stddata;
 var stddatadimension;
+var stdss = JSON.parse(myMapSet.SeriesSet);
+var valuecolname =[];
+var haveseries = true;
+if(stdss.SeriesCol==null||stdss.SeriesCol == 'undefined') haveseries = false;
+for (var i = 0; i < stdss.ValueCols.length; i++) {
+    valuecolname.push(stdss.ValueCols[i].Name);
+};
 
 initMap();
 document.getElementById("float").style.visibility ='hidden';
@@ -21,11 +29,9 @@ myChart.on('dblclick', function(params) {
 });
 //价值分析时通过选择地图进行柱状图对比
 myChart.on('mapselectchanged', function(params) {
-    if (myMapCode != 'AMZCMapAllCost') return;
+    if (haveseries) return;
     var selected = params.selected;
     var names = [];
-    var ss = JSON.parse(myMapSet.SeriesSet);
-
     for (var i = 0; i < stddata.length; i++) {
         if (selected[stddata[i].AreaName]) {
             names.push(stddata[i].AreaName);
@@ -33,7 +39,7 @@ myChart.on('mapselectchanged', function(params) {
     }
     var optiontemp = {
         legend: {
-            data: ['资产数量', '资产原值', '资产净值']
+            data: valuecolname
         },
         yAxis: {
             data: names
@@ -45,13 +51,11 @@ myChart.on('mapselectchanged', function(params) {
 });
 //其余通过选择图例
 myChart.on('legendselectchanged', function(params) {
-        if (myMapCode == 'AMZCMapAllCost') return;
+        if (!haveseries) return;
         if (stddatadimension == null || stddatadimension == 'undefined') return;
         var selected = params.selected;
-        var ss = JSON.parse(myMapSet.SeriesSet);
-        var data = summarizedatabydimension(stddatadimension, ss);
+        var data = summarizedatabydimension(stddatadimension, stdss);
         var names = [];
-        var legendnames = [];
         var seriesdata = [];
         for (var o in data) {
             if (selected[o]) {
@@ -60,7 +64,7 @@ myChart.on('legendselectchanged', function(params) {
         }
         var optiontemp = {
             legend: {
-                data: ['资产数量', '资产原值', '资产净值']
+                data: valuecolname
             },
             yAxis: {
                 data: names
@@ -151,21 +155,20 @@ function loadAreaData(area) {
 }
 //获取当前区域包含的序列名称集合
 function getSerieNames(area) {
-    var ss = JSON.parse(myMapSet.SeriesSet);
-    if (ss == null)
+    if (stdss == null)
         return null;
     var snames = [];
-    if (ss.SeriesCol == "undefined" || ss.SeriesCol == null) {
-        var count = ss.ValueCols.length;
+    if (stdss.SeriesCol == "undefined" || stdss.SeriesCol == null) {
+        var count = stdss.ValueCols.length;
         for (var i = 0; i < count; i++)
-            snames.push(ss.ValueCols[i].Name);
+            snames.push(stdss.ValueCols[i].Name);
     } else {
         var d = area.Data;
         if (d != "undefined" && d != null) {
             var c = d.length;
             var s = ",";
             for (var j = 0; j < c; j++) {
-                var t = d[j][ss.SeriesCol.NameCol];
+                var t = d[j][stdss.SeriesCol.NameCol];
                 if (t == "undefined" || t == null || t == "" || s.indexOf("," + t + ",") >= 0)
                     continue;
                 snames.push(t);
@@ -177,17 +180,16 @@ function getSerieNames(area) {
 }
 
 function getSeries(area) {
-    var ss = JSON.parse(myMapSet.SeriesSet);
     var series = [];
-    var valueCol = myValueCol == null ? ss.ValueCols[0].Col : myValueCol;
+    var valueCol = myValueCol == null ? stdss.ValueCols[0].Col : myValueCol;
     var selectmode;
-    if (myMapCode == 'AMZCMapAllCost') selectmode = 'multiple';
+    if (!haveseries) selectmode = 'multiple';
     else selectmode = false;
-    if (ss.SeriesCol == "undefined" || ss.SeriesCol == null) {
-        var count = ss.ValueCols.length;
+    if (stdss.SeriesCol == "undefined" || stdss.SeriesCol == null) {
+        var count = stdss.ValueCols.length;
         for (var i = 0; i < count; i++) {
             var s = {
-                name: ss.ValueCols[i].Name,
+                name: stdss.ValueCols[i].Name,
                 type: 'map',
                 mapType: area.Name,
                 selectedMode: selectmode,
@@ -209,7 +211,7 @@ function getSeries(area) {
                     for (var j = 0; j < count1; j++)
                         da.push({
                             name: area.Data[j].AreaName,
-                            value: area.Data[j][ss.ValueCols[i].Col]
+                            value: area.Data[j][stdss.ValueCols[i].Col]
                         });
                     return da;
                 })()
@@ -222,7 +224,7 @@ function getSeries(area) {
             var c = d.length;
             var s = {};
             for (var j = 0; j < c; j++) {
-                var t = d[j][ss.SeriesCol.NameCol];
+                var t = d[j][stdss.SeriesCol.NameCol];
                 if (t == "undefined" || t == null || t == "")
                     continue;
                 if (s[t] == "undefined" || s[t] == null) {
@@ -264,7 +266,7 @@ function showAreaData(area) {
     var selectmode;
     var legendnames = getSerieNames(area);
     var selected = {};
-    if (myMapCode == 'AMZCMapAllCost') {
+    if (!haveseries) {
         selectmode = 'single';
     } else {
         selectmode = 'multiple';
@@ -350,29 +352,28 @@ function settabledatas(area) {
     names.push({
         "title": "地区"
     });
-    var ss = JSON.parse(myMapSet.SeriesSet);
-    if (ss == null)
+    if (stdss == null)
         return null;
-    if (ss.SeriesCol == "undefined" || ss.SeriesCol == null) {
+    if (stdss.SeriesCol == "undefined" || stdss.SeriesCol == null) {
         series = false;
     } else {
         names.push({
-            "title": getdimensionnamebycode(myMapCode)
+            "title": stdss.SeriesCol.Name
         });
     }
-    var count = ss.ValueCols.length;
+    var count = stdss.ValueCols.length;
     for (var i = 0; i < count; i++)
         names.push({
-            "title": ss.ValueCols[i].Name
+            "title": stdss.ValueCols[i].Name
         });
     //data
     var d = area.Data;
     for (var i = 0; i < d.length; i++) {
         var temp = [];
         temp.push(d[i].AreaName);
-        if (series) temp.push(d[i][ss.SeriesCol.NameCol]);
+        if (series) temp.push(d[i][stdss.SeriesCol.NameCol]);
         for (var j = 0; j < count; j++) {
-            temp.push(d[i][ss.ValueCols[j].Col]);
+            temp.push(d[i][stdss.ValueCols[j].Col]);
         }
         datas.push(temp);
 
@@ -392,16 +393,16 @@ function settabledatas(area) {
 function piechart(area, strcode, mapset, chart) {
 
     var mapcode = strcode;
-    var ss = JSON.parse(mapset.SeriesSet);
-    var valuecol = myValueCol == null ? ss.ValueCols[0].Col : myValueCol;
+    var valuecol = myValueCol == null ? stdss.ValueCols[0].Col : myValueCol;
     var title;
-    for (var i = 0; i < ss.ValueCols.length; i++) {
-        if (ss.ValueCols[i].Col == valuecol) {
-            title = ss.ValueCols[i].Name;
+    for (var i = 0; i < stdss.ValueCols.length; i++) {
+        if (stdss.ValueCols[i].Col == valuecol) {
+            title = stdss.ValueCols[i].Name;
             break;
         }
     }
-    title = title + '地区分布比例';
+    title = title + '地区分布';
+    if (maplistbymk.PieTitle != null && maplistbymk.PieTitle != 'undefined') title = maplistbymk.PieTitle;
     var optionPie = {
         backgroundColor: '#2c343c',
 
@@ -432,7 +433,7 @@ function piechart(area, strcode, mapset, chart) {
             type: 'pie',
             radius: '50%',
             center: ['50%', '60%'],
-            data: getdatasofpie(area, ss.ValueCols[0].Col).sort(function(a, b) {
+            data: getdatasofpie(area, stdss.ValueCols[0].Col).sort(function(a, b) {
                 return a.value - b.value
             }),
             roseType: 'angle',
@@ -485,15 +486,20 @@ function barchart(t) {
     //   valuecolname.push(ss.ValueCols[i].Name);
     //}
     //title = title + '地区对比';
-    var optiontemp = option;
-    var title = '(按地区)';
-    if (myMapCode == 'AMZCMapTypeCost' || myMapCode == 'AMZCMapLandCost') title = '(按类别)';
-    else if (myMapCode == 'AMZCMapOwnerCost') title = '(按权属)';
-    else if (myMapCode == 'AMZCMapAllCost') title = '(按地区)';
+    //var optiontemp = option;
+    var title = '资产价值对比';
+    if (maplistbymk.PieTitle != null && maplistbymk.PieTitle != 'undefined') title = maplistbymk.BarTitle;
+    var title1;
+    if (stdss.SeriesCol == null || stdss.SeriesCol == 'undefined') title1 = '(按地区)';
+    else title1 = '(按' + stdss.SeriesCol.Name + ')';
+    
+    //if (myMapCode == 'AMZCMapTypeCost' || myMapCode == 'AMZCMapLandCost') title = '(按类别)';
+    //else if (myMapCode == 'AMZCMapOwnerCost') title = '(按权属)';
+    //else if (myMapCode == 'AMZCMapAllCost') title = '(按地区)';
     var optionbar = {
         backgroundColor: '#2c343c',
         title: {
-            text: '资产价值对比' + title,
+            text: title + title1,
             left: 'left',
             top: 20,
             textStyle: {
@@ -514,6 +520,7 @@ function barchart(t) {
                 color: '#ff006e'
             },
             selectedMode: 'single',
+            right:20,
             data: []
         },
         grid: {
@@ -568,27 +575,26 @@ function getbardataseries() {
     var len = arguments.length;
     if (len < 1) return;
     var series = [];
-    var ss = JSON.parse(myMapSet.SeriesSet);
     var names = arguments[0];
-    for (var i = 0; i < ss.ValueCols.length; i++) {
+    for (var i = 0; i < stdss.ValueCols.length; i++) {
         var data = [];
         for (var j = 0; j < names.length; j++) {
             if (len == 1) { //地区对比
                 for (var k = 0; k < stddata.length; k++) {
                     if (stddata[k].AreaName == names[j]) {
-                        data.push(stddata[k][ss.ValueCols[i].Col]);
+                        data.push(stddata[k][stdss.ValueCols[i].Col]);
                     }
                 }
             } else if (len == 2) { //根据维度对比需要第二个参数 分组合计后的数据
                 var bardata = arguments[1];
                 for (var j = 0; j < names.length; j++) {
-                    data.push(bardata[names[j]][ss.ValueCols[i].Name]);
+                    data.push(bardata[names[j]][stdss.ValueCols[i].Name]);
                 }
             }
 
         }
         series.push({
-            name: ss.ValueCols[i].Name,
+            name: stdss.ValueCols[i].Name,
             type: 'bar',
             label: {
                 normal: {

@@ -75,6 +75,18 @@ namespace Generoft.AM.Public.Map.Core
             throw new GSPException(string.Format("编号为[{0}]地图未找到，请预制！", mapCode));
         }
         /// <summary>
+        /// 获取模块id下的所有地图列表
+        /// </summary>
+        /// <param name="mkid"></param>
+        public DataTable GetMKMap(string mkid)
+        {
+            IGSPDatabase db = GSPContext.Current.Database;
+            string sql = "select MapCode,MapName from DPPubMapSet where MKMark = {0}";
+            DataTable dt = db.ExecuteDataSet(sql, mkid).Tables[0];
+            //Dictionary<string, string> dic = new Dictionary<string, string>();
+            return dt;
+        }
+        /// <summary>
         /// 获取区域统计数据
         /// </summary>
         /// <param name="mapCode">地图编号</param>
@@ -111,5 +123,6 @@ where mapArea.Path like '{2}%' and mapArea.Grade={3} and mapArea2.Path like mapA
                 string.IsNullOrEmpty(cond) ? "" : " and " + cond, group);
             return Db.ExecuteDataSet(sql);
         }
+
     }
 }
